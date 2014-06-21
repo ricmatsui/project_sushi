@@ -8,6 +8,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
+from django.conf import global_settings
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -39,6 +41,8 @@ if DEBUG:
 
 # Application definition
 
+SITE_ID = 1
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,10 +50,15 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'south',
+    'core',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.bitbucket',
     'debug_toolbar',
     'pipeline',
-    'core',
     'projects',
 )
 
@@ -60,6 +69,21 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    # Required by allauth template tags
+    "django.core.context_processors.request",
+    # allauth specific context processors
+    "allauth.account.context_processors.account",
+    "allauth.socialaccount.context_processors.socialaccount",
 )
 
 ROOT_URLCONF = 'project_sushi.urls'
@@ -90,11 +114,11 @@ PIPELINE_COMPILERS = (
 )
 
 PIPELINE_CSS = {
-    'bootstrap': {
+    'core': {
         'source_filenames': (
-            'bootstrap/less/bootstrap.less',
+            'core/less/core.less',
         ),
-        'output_filename': 'bootstrap/css/bootstrap.css',
+        'output_filename': 'core/css/core.css',
     },
     'projects': {
         'source_filenames': (
